@@ -1,0 +1,111 @@
+# Description of what this change includes
+# Revision number
+# 12-02-2025
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "VPC-priakh3789 - AWS VPC with 3 Subnets in us-west-2"
+
+Resources:
+
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: VPC-priakh3789
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: IGW-priakh3789
+
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: Public-RT-priakh3789
+
+  PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: AttachGateway
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  SubnetA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: us-west-2a
+      CidrBlock: 10.0.1.0/24
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: SubnetA-priakh3789
+
+  SubnetB:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: us-west-2b
+      CidrBlock: 10.0.2.0/24
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: SubnetB-priakh3789
+
+  SubnetC:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: us-west-2c
+      CidrBlock: 10.0.3.0/24
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: SubnetC-priakh3789
+
+  SubnetARouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref SubnetA
+      RouteTableId: !Ref PublicRouteTable
+
+  SubnetBRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref SubnetB
+      RouteTableId: !Ref PublicRouteTable
+
+  SubnetCRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref SubnetC
+      RouteTableId: !Ref PublicRouteTable
+
+Outputs:
+  VpcId:
+    Description: "VPC ID"
+    Value: !Ref VPC
+  Subnet1Id:
+    Description: "Subnet A ID"
+    Value: !Ref SubnetA
+  Subnet2Id:
+    Description: "Subnet B ID"
+    Value: !Ref SubnetB
+  Subnet3Id:
+    Description: "Subnet C ID"
+    Value: !Ref SubnetC
